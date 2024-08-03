@@ -1,49 +1,19 @@
 package ru.hogwarts.school.service;
 
-import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 
-@Service
-public class StudentService {
+public interface StudentService {
 
-    private final HashMap<Long, Student> students = new HashMap<>();
-    private long count = 0;
+    Student createStudent(Student student);
 
-    public Student addStudent(Student student) {
-        student.setId(++count);
-        students.put(student.getId(), student);
-        return student;
-    }
+    Student readStudent(long id);
 
-    public Student findStudent(long id) {
-        return students.get(id);
-    }
+    Student updateStudent(Long id, Student student);
 
-    public Student editStudent(Student student) {
-        if (!students.containsKey(student.getId())) {
-            return null;
-        }
-        students.put(student.getId(), student);
-        return student;
-    }
+    Student deleteStudent(long id);
 
-    public Student deleteStudent(long id) {
-        return students.remove(id);
-    }
-
-    public Collection<Student> findAgeStudent(int age) {
-        ArrayList<Student> foundAgeStudent = new ArrayList<>();
-        for (Student student : students.values()) {
-            if (student.getAge() == age) {
-                foundAgeStudent.add(student);
-            }
-
-        }
-        return foundAgeStudent;
-    }
+    List<Student> findAgeStudent(int age);
 
 }
