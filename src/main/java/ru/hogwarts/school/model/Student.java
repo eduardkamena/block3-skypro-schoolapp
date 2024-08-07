@@ -1,12 +1,22 @@
 package ru.hogwarts.school.model;
 
+import jakarta.persistence.*;
+
 import java.util.Objects;
 
+@Entity
 public class Student {
 
+    @Id
+    @SequenceGenerator(name = "stu_seq", sequenceName = "STUDENT_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stu_seq")
     private Long id;
+
     private String name;
     private int age;
+
+    public Student() {
+    }
 
     public Student(Long id, String name, int age) {
         this.id = id;
