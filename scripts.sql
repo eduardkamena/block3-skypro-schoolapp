@@ -13,3 +13,5 @@ SELECT * FROM student WHERE NAME ILIKE '%e%'; -- ILIKE - без учета ре�
 SELECT * FROM student WHERE student.age < student.id;
 
 SELECT * FROM student ORDER BY age;
+
+SELECT * FROM avatar;
