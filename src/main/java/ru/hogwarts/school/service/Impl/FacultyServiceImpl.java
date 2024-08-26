@@ -8,6 +8,7 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
@@ -32,15 +33,15 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty updateFaculty(Long id, Faculty faculty) {
-        return facultyRepository
-                .findById(id)
-                .map(facultyFromDB -> {
-                    facultyFromDB.setName(faculty.getName());
-                    facultyFromDB.setColor(faculty.getColor());
-                    facultyRepository.save(facultyFromDB);
-                    return facultyFromDB;
-                })
-                .orElse(null);
+
+        Optional<Faculty> facultyFromDB = facultyRepository.findById(id);
+        if (facultyFromDB.isPresent()) {
+            Faculty temp = facultyFromDB.get();
+            temp.setName(faculty.getName());
+            temp.setColor(faculty.getColor());
+            facultyRepository.save(temp);
+        }
+        return null;
     }
 
     @Override

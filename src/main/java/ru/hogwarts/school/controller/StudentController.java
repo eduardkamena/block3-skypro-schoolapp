@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.Impl.StudentServiceImpl;
+import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -14,10 +15,10 @@ import java.util.Collections;
 @RequestMapping(path = "student")
 public class StudentController {
 
-    StudentServiceImpl studentService;
+    private final StudentService studentService;
 
-    public StudentController(StudentServiceImpl studentServiceImpl) {
-        this.studentService = studentServiceImpl;
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
     }
 
     @PostMapping
