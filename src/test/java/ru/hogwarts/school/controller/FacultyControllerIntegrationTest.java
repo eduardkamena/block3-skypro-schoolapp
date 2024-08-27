@@ -11,7 +11,6 @@ import org.springframework.http.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,7 @@ public class FacultyControllerIntegrationTest {
     @Test
     void shouldCreateFaculty() {
         // given
-        Faculty faculty = new Faculty("Griffindor", "Green");
+        Faculty faculty = new Faculty("name", "color");
 
         // when
         ResponseEntity<Faculty> facultyResponseEntity = restTemplate.postForEntity(
@@ -67,8 +66,15 @@ public class FacultyControllerIntegrationTest {
         Faculty facultyForUpdate = new Faculty("newName", "newColor");
 
         // when
-        restTemplate.put("/faculty/" + faculty.getId(), facultyForUpdate);
-        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.getForEntity("/faculty/" + faculty.getId(), Faculty.class);
+        restTemplate.put(
+                "/faculty/" + faculty.getId(),
+                facultyForUpdate
+        );
+
+        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.getForEntity(
+                "/faculty/" + faculty.getId(),
+                Faculty.class
+        );
 
         // then
         assertNotNull(facultyResponseEntity);
@@ -88,7 +94,7 @@ public class FacultyControllerIntegrationTest {
 
         // when
         ResponseEntity<Faculty> facultyResponseEntity = restTemplate.getForEntity(
-                "http://localhost:" + port + "/faculty/" + faculty.getId(),
+                "/faculty/" + faculty.getId(),
                 Faculty.class
         );
 
@@ -110,7 +116,7 @@ public class FacultyControllerIntegrationTest {
 
         // when
         ResponseEntity<Faculty> facultyResponseEntity = restTemplate.exchange(
-                "http://localhost:" + port + "/faculty/" + faculty.getId(),
+                "/faculty/" + faculty.getId(),
                 HttpMethod.DELETE,
                 null,
                 Faculty.class
@@ -124,29 +130,19 @@ public class FacultyControllerIntegrationTest {
     }
 
     @Test
-    public void shouldFindFacultyByColorOrName() throws Exception {
-        Faculty faculty = new Faculty("name", "color");
-        faculty = facultyRepository.save(faculty);
-
-        assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty/nameOrColor?name=" + faculty.getName(), String.class))
-                .isNotNull();
-        assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty/nameOrColor?color=" + faculty.getColor(), String.class))
-                .isNotNull();
-    }
-
-    @Test
     public void shouldFindColorFaculty() throws Exception {
+        // given
         Faculty faculty = new Faculty("name", "color");
         faculty = facultyRepository.save(faculty);
 
         // when
-
-        ResponseEntity <List<Faculty>> facultyResponseEntity = restTemplate.exchange(
+        ResponseEntity<List<Faculty>> facultyResponseEntity = restTemplate.exchange(
                 "/faculty?color=" + faculty.getColor(),
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {
-        });
+                }
+        );
 
         // then
         assertNotNull(facultyResponseEntity);
@@ -158,4 +154,48 @@ public class FacultyControllerIntegrationTest {
         assertEquals(actualFaculty.get(0).getName(), faculty.getName());
         assertEquals(actualFaculty.get(0).getColor(), faculty.getColor());
     }
+
+    @Test
+    public void shouldFindFacultyByColorOrName() throws Exception {
+        // given
+        Faculty faculty = new Faculty("name", "color");
+        faculty = facultyRepository.save(faculty);
+
+        // when
+        ResponseEntity<List<Faculty>> facultyResponseEntityColor = restTemplate.exchange(
+                "/faculty/nameOrColor?color=" + faculty.getColor(),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        ResponseEntity<List<Faculty>> facultyResponseEntityName = restTemplate.exchange(
+                "/faculty/nameOrColor?name=" + faculty.getName(),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        // then
+        assertNotNull(facultyResponseEntityColor);
+        assertEquals(facultyResponseEntityColor.getStatusCode(), HttpStatusCode.valueOf(200));
+
+        assertNotNull(facultyResponseEntityName);
+        assertEquals(facultyResponseEntityName.getStatusCode(), HttpStatusCode.valueOf(200));
+
+        List<Faculty> actualFacultyColor = facultyResponseEntityColor.getBody();
+        assertEquals(actualFacultyColor.size(), 1);
+        assertEquals(actualFacultyColor.get(0).getId(), faculty.getId());
+        assertEquals(actualFacultyColor.get(0).getName(), faculty.getName());
+        assertEquals(actualFacultyColor.get(0).getColor(), faculty.getColor());
+
+        List<Faculty> actualFacultyName = facultyResponseEntityName.getBody();
+        assertEquals(actualFacultyName.size(), 1);
+        assertEquals(actualFacultyName.get(0).getId(), faculty.getId());
+        assertEquals(actualFacultyName.get(0).getName(), faculty.getName());
+        assertEquals(actualFacultyName.get(0).getColor(), faculty.getColor());
+    }
+
 }
