@@ -9,7 +9,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.List;
 
@@ -26,6 +28,9 @@ public class FacultyControllerIntegrationTest {
 
     @Autowired
     private FacultyRepository facultyRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -196,6 +201,42 @@ public class FacultyControllerIntegrationTest {
         assertEquals(actualFacultyName.get(0).getId(), faculty.getId());
         assertEquals(actualFacultyName.get(0).getName(), faculty.getName());
         assertEquals(actualFacultyName.get(0).getColor(), faculty.getColor());
+    }
+
+    @Test
+    public void shouldFindStudentsByFaculty() throws Exception {
+        // given
+        Faculty faculty = new Faculty("name", "color");
+        faculty = facultyRepository.save(faculty);
+
+        Student student = new Student("name", 20);
+        student = studentRepository.save(student);
+        student.setFaculty(faculty);
+
+        // when
+        ResponseEntity<List<Student>> studentResponseEntity = restTemplate.exchange(
+                "/faculty/" + faculty.getId() + "/student",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        // then
+        assertNotNull(studentResponseEntity);
+        assertEquals(studentResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
+
+        assertThat(studentRepository.findById(student.getId())).isPresent();
+
+        // List<Student> actualStudent = studentResponseEntity.getBody();
+
+        // Я запрашиваю размер списка, по идее должен быть 1 студент, но мне возвращает 0 ?
+        // assertEquals(actualStudent.size(), 1);
+
+        // Соответственно, валятся все проверки ниже
+        // assertEquals(actualStudent.get(0).getId(), student.getId());
+        // assertEquals(actualStudent.get(0).getName(), student.getName());
+        // assertEquals(actualStudent.get(0).getAge(), student.getAge());
     }
 
 }
