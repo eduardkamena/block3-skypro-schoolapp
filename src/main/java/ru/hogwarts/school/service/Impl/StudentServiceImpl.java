@@ -71,4 +71,19 @@ public class StudentServiceImpl implements StudentService {
                 .orElse(null);
     }
 
+    @Override
+    public Integer getAllStudents() {
+        return studentRepository.getAllStudents();
+    }
+
+    @Override
+    public Float getAverageStudentAge() {
+        return studentRepository.getAverageStudentAge();
+    }
+
+    @Override
+    public List<Student> getLastPostedStudents() {
+        return studentRepository.getLastPostedStudents();
+    }
+
 }
