@@ -196,32 +196,29 @@ public class StudentControllerIntegrationTest {
         assertEquals(actualStudent.size(), 1);
     }
 
-//    @Test
-//    public void shouldFindFacultyByStudent() throws Exception {
-//        // given
-//        Faculty faculty = new Faculty("name", "color");
-//        faculty = facultyRepository.save(faculty);
-//
-//        Student student = new Student("name", 20);
-//        student = studentRepository.save(student);
-//
-//        List<Student> students = List.of(student);
-//        faculty.setStudents(students);
-//        student.setFaculty(faculty);
-//
-//        // when
-//        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.exchange(
-//                "/student/" + student.getId() + "/faculty",
-//                HttpMethod.GET,
-//                null,
-//                Faculty.class
-//        );
-//
-//        // then
-//        assertNotNull(facultyResponseEntity);
-//        assertEquals(facultyResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
-//
-//        assertThat(facultyRepository.findById(faculty.getId())).isPresent();
-//    }
+    @Test
+    public void shouldFindFacultyByStudent() throws Exception {
+        // given
+        Faculty faculty = new Faculty("name", "color");
+        faculty = facultyRepository.save(faculty);
+
+        Student student = new Student("name", 20);
+        student.setFaculty(faculty);
+        student = studentRepository.save(student);
+
+        // when
+        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.exchange(
+                "/student/" + student.getId() + "/faculty",
+                HttpMethod.GET,
+                null,
+                Faculty.class
+        );
+
+        // then
+        assertNotNull(facultyResponseEntity);
+        assertEquals(facultyResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
+
+        assertThat(facultyRepository.findById(faculty.getId())).isPresent();
+    }
 
 }
