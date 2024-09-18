@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service.Impl;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Service
 public class AvatarServiceImpl implements AvatarService {
 
+    private final  Logger logger = LoggerFactory.getLogger(AvatarServiceImpl.class);
+
     private final String avatarsDir;
     private final StudentService studentService;
     private final AvatarRepository avatarRepository;
@@ -37,6 +41,10 @@ public class AvatarServiceImpl implements AvatarService {
     @Override
     @Transactional
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
+
+        logger.info("Was invoked method for upload avatar");
+        logger.error("There is not student with id = {}", studentId);
+
         Student student = studentService.readStudent(studentId);
 
         Path filePath = Path.of(avatarsDir, "Student ID_" + studentId + "." + getExtension(avatarFile.getOriginalFilename()));
@@ -57,12 +65,16 @@ public class AvatarServiceImpl implements AvatarService {
         avatar.setMediaType(avatarFile.getContentType());
         avatar.setData(generateImagePreview(filePath));
 
+        logger.debug("Avatar for studentID {} should be correctly upload with avatarFile {}", studentId, avatarFile);
+
         avatarRepository.save(avatar);
     }
 
     @Override
     @Transactional
     public Avatar findAvatar(Long studentId) {
+        logger.info("Was invoked method for find avatar");
+
         return avatarRepository
                 .findByStudentId(studentId)
                 .orElse(new Avatar());
@@ -97,6 +109,7 @@ public class AvatarServiceImpl implements AvatarService {
 
     @Override
     public List<Avatar> findAll(Integer pageNumber, Integer pageSize) {
+        logger.debug("Should find all avatars by pageNumber {} and pageSize {}", pageNumber, pageSize);
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         return avatarRepository.findAll(pageRequest).getContent();
     }

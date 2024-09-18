@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service.Impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -12,6 +14,8 @@ import java.util.Optional;
 @Service
 public class StudentServiceImpl implements StudentService {
 
+    private final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
+
     private final StudentRepository studentRepository;
 
     public StudentServiceImpl(StudentRepository studentRepository) {
@@ -20,11 +24,14 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student createStudent(Student student) {
+        logger.info("Was invoked method for create student");
+        logger.warn("Student age must be >16");
         return studentRepository.save(student);
     }
 
     @Override
     public Student readStudent(long id) {
+        logger.info("Was invoked method for get student");
         return studentRepository
                 .findById(id)
                 .orElse(null);
@@ -32,7 +39,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student updateStudent(Long id, Student student) {
-
+        logger.info("Was invoked method for update student");
         Optional<Student> studentFromDB = studentRepository.findById(id);
         if (studentFromDB.isPresent()) {
             Student temp = studentFromDB.get();
@@ -40,11 +47,14 @@ public class StudentServiceImpl implements StudentService {
             temp.setAge(student.getAge());
             studentRepository.save(temp);
         }
+        logger.debug("Student by id {} should be updated", id);
         return null;
     }
 
     @Override
     public Student deleteStudent(long id) {
+        logger.info("Was invoked method for delete student");
+        logger.debug("Student by id {} should be deleted", id);
         return studentRepository
                 .findById(id)
                 .map(student -> {
@@ -56,16 +66,20 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> findAgeStudent(int age) {
+        logger.info("Was invoked method for find student by age");
         return studentRepository.findAllByAge(age);
     }
 
     @Override
     public List<Student> findByAgeBetween(int ageMin, int ageMax) {
+        logger.info("Was invoked method for find student by age between");
+        logger.warn("ageMin must be < ageMax");
         return studentRepository.findByAgeBetween(ageMin, ageMax);
     }
 
     @Override
     public Faculty getFaculty(Long studentId) {
+        logger.info("Was invoked method for get student faculty by studentId {}", studentId);
         return studentRepository.findById(studentId)
                 .map(Student::getFaculty)
                 .orElse(null);
@@ -73,16 +87,19 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Integer getAllStudents() {
+        logger.info("Was invoked method for get all students");
         return studentRepository.getAllStudents();
     }
 
     @Override
     public Float getAverageStudentAge() {
+        logger.info("Was invoked method for get average student age");
         return studentRepository.getAverageStudentAge();
     }
 
     @Override
     public List<Student> getLastPostedStudents() {
+        logger.info("Was invoked method for find last 5 posted students");
         return studentRepository.getLastPostedStudents();
     }
 
