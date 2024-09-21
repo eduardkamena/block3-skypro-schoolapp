@@ -126,4 +126,65 @@ public class StudentServiceImpl implements StudentService {
                 .orElse(0);
     }
 
+    @Override
+    public void printParallelThread() {
+
+        List<Student> students = studentRepository.findAll();
+
+        // делал через sout, но через logger нагляднее, так как показывается поток, который работает
+        logger.info("[0] {}", students.get(0).getName());
+        logger.info("[1] {}", students.get(1).getName());
+
+        new Thread(() -> {
+            logger.info("[2] {}", students.get(2).getName());
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            logger.info("[3] {}", students.get(3).getName());
+        }).start();
+
+
+        new Thread(() -> {
+            logger.info("[4] {}", students.get(4).getName());
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            logger.info("[5] {}", students.get(5).getName());
+        }).start();
+    }
+
+    @Override
+    public void printSynchronizedThread() {
+
+        List<Student> students = studentRepository.findAll();
+
+        // залокал поток на List<Student> students, не стал создавать отдельный метод и отдельный объект
+        // и снова через logger, так как видно, что потоки последовательны
+        synchronized (students) {
+            logger.info("[0] {}", students.get(0).getName());
+            logger.info("[1] {}", students.get(1).getName());
+        }
+        new Thread(() -> {
+            synchronized (students) {
+                logger.info("[2] {}", students.get(2).getName());
+                logger.info("[3] {}", students.get(3).getName());
+            }
+        }).start();
+
+        new Thread(() -> {
+            synchronized (students) {
+                logger.info("[4] {}", students.get(4).getName());
+                logger.info("[5] {}", students.get(5).getName());
+            }
+        }).start();
+    }
+
 }

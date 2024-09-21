@@ -110,4 +110,14 @@ public class StudentController {
         return ResponseEntity.ok(averageAge);
     }
 
+    @GetMapping(path = "print-parallel")
+    public void printParallelThread() {
+        studentService.printParallelThread();
+    }
+
+    @GetMapping(path = "print-synchronized")
+    public void printSynchronizedThread() {
+        studentService.printSynchronizedThread();
+    }
+
 }
