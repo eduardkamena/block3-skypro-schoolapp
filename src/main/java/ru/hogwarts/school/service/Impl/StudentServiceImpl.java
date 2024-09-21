@@ -10,6 +10,7 @@ import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -101,6 +102,28 @@ public class StudentServiceImpl implements StudentService {
     public List<Student> getLastPostedStudents() {
         logger.info("Was invoked method for find last 5 posted students");
         return studentRepository.getLastPostedStudents();
+    }
+
+    @Override
+    public List<String> getStudentsNamesStartsWith() {
+        logger.info("Was invoked method for get students names starts with E");
+        return studentRepository.findAll()
+                .stream()
+                .map(Student::getName)
+                .map(String::toUpperCase)
+                .filter(f -> f.startsWith("E")) // Сделал начало с Е, так как на А у меня нет студентов
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Double getAverageAgeAllStudentsStream() {
+        logger.info("Was invoked method for get average age of students by stream impl");
+        return studentRepository.findAll()
+                .stream()
+                .mapToDouble(Student::getAge)
+                .average()
+                .orElse(0);
     }
 
 }

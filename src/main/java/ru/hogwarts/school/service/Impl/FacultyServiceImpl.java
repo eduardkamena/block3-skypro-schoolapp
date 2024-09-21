@@ -3,11 +3,13 @@ package ru.hogwarts.school.service.Impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.controller.FacultyController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,6 +83,16 @@ public class FacultyServiceImpl implements FacultyService {
         logger.info("Was invoked method for get students by facultyId {}", facultyId);
         return facultyRepository.findById(facultyId)
                 .map(Faculty::getStudents)
+                .orElse(null);
+    }
+
+    @Override
+    public String getLongestFacultyName() {
+        logger.info("Was invoked method for get longest faculty name");
+        return facultyRepository.findAll()
+                .stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparing(String::length))
                 .orElse(null);
     }
 

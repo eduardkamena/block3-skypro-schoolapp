@@ -15,6 +15,7 @@ import ru.hogwarts.school.service.StudentService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -229,6 +230,150 @@ public class StudentControllerWebMvcTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[0].name", Matchers.equalTo("firstName")))
                 .andExpect(jsonPath("$[1].name", Matchers.equalTo("secondName")));
+    }
+
+    @Test
+    public void shouldGetAmountOfAllStudents() throws Exception {
+        // given
+        List<Student> students = new ArrayList<>();
+
+        Student firstStudent = new Student();
+        firstStudent.setName("firstName");
+        firstStudent.setAge(20);
+        students.add(firstStudent);
+
+        Student secondStudent = new Student();
+        secondStudent.setName("secondName");
+        secondStudent.setAge(40);
+        students.add(secondStudent);
+
+        // when
+        when(studentService.getAllStudents()).thenReturn(2);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/" + "count_amount"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(2));
+    }
+
+    @Test
+    public void shouldGetAverageStudentAge() throws Exception {
+        // given
+        List<Student> students = new ArrayList<>();
+
+        Student firstStudent = new Student();
+        firstStudent.setName("firstName");
+        firstStudent.setAge(20);
+        students.add(firstStudent);
+
+        Student secondStudent = new Student();
+        secondStudent.setName("secondName");
+        secondStudent.setAge(30);
+        students.add(secondStudent);
+
+        // when
+        when(studentService.getAverageStudentAge()).thenReturn(25f);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/" + "average_age"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(25));
+    }
+
+    @Test
+    public void shouldGetLastPostedStudents() throws Exception {
+        // given
+        List<Student> students = new ArrayList<>();
+
+        Student student1 = new Student();
+        student1.setName("firstName");
+        student1.setAge(20);
+        students.add(student1);
+
+        Student student2 = new Student();
+        student2.setName("secondName");
+        student2.setAge(30);
+        students.add(student2);
+
+        Student student3 = new Student();
+        student3.setName("third");
+        student3.setAge(20);
+        students.add(student3);
+
+        Student student4 = new Student();
+        student4.setName("fourth");
+        student4.setAge(30);
+        students.add(student4);
+
+        Student student5 = new Student();
+        student5.setName("fifth");
+        student5.setAge(20);
+        students.add(student5);
+
+        // when
+        when(studentService.getLastPostedStudents()).thenReturn(students);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/last_posted"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(5)))
+                .andExpect(jsonPath("$[0].name", Matchers.equalTo("firstName")))
+                .andExpect(jsonPath("$[4].name", Matchers.equalTo("fifth")));
+    }
+
+    @Test
+    public void shouldGetStudentsNamesStartsWith() throws Exception {
+        // given
+        List<Student> students = new ArrayList<>();
+
+        Student student1 = new Student();
+        student1.setName("name");
+        student1.setAge(20);
+        students.add(student1);
+
+        Student student2 = new Student();
+        student2.setName("email");
+        student2.setAge(30);
+        students.add(student2);
+
+        List<String> studentNames = List.of(student2.getName());
+
+        // when
+        when(studentService.getStudentsNamesStartsWith()).thenReturn(studentNames);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/name_starts_with_E"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("email"));
+    }
+
+    @Test
+    public void shouldGetAverageAgeAllStudentsStream() throws Exception {
+        // given
+        List<Student> students = new ArrayList<>();
+
+        Student firstStudent = new Student();
+        firstStudent.setName("firstName");
+        firstStudent.setAge(20);
+        students.add(firstStudent);
+
+        Student secondStudent = new Student();
+        secondStudent.setName("secondName");
+        secondStudent.setAge(30);
+        students.add(secondStudent);
+
+        // when
+        when(studentService.getAverageAgeAllStudentsStream()).thenReturn(25d);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/" + "average_age_stream"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(25));
     }
 
 }

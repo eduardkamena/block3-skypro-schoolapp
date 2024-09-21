@@ -98,4 +98,16 @@ public class StudentController {
         return ResponseEntity.ok(lastPostedStudents);
     }
 
+    @GetMapping(path = "name_starts_with_E")
+    public ResponseEntity<List<String>> getStudentsNamesStartsWith() {
+        List<String> startsWith = studentService.getStudentsNamesStartsWith();
+        return ResponseEntity.ok(startsWith);
+    }
+
+    @GetMapping(path = "average_age_stream")
+    public ResponseEntity<Double> getAverageAgeAllStudentsStream() {
+        Double averageAge = studentService.getAverageAgeAllStudentsStream();
+        return ResponseEntity.ok(averageAge);
+    }
+
 }

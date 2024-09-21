@@ -27,4 +27,8 @@ public interface StudentService {
 
     List<Student> getLastPostedStudents();
 
+    List<String> getStudentsNamesStartsWith();
+
+    Double getAverageAgeAllStudentsStream();
+
 }
