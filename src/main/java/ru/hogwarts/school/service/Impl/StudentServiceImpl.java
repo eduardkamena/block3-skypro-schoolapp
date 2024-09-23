@@ -1,6 +1,5 @@
 package ru.hogwarts.school.service.Impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -8,6 +7,7 @@ import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -32,15 +32,15 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student updateStudent(Long id, Student student) {
-        return studentRepository
-                .findById(id)
-                .map(studentFromDB -> {
-                    studentFromDB.setName(student.getName());
-                    studentFromDB.setAge(student.getAge());
-                    studentRepository.save(studentFromDB);
-                    return studentFromDB;
-                })
-                .orElse(null);
+
+        Optional<Student> studentFromDB = studentRepository.findById(id);
+        if (studentFromDB.isPresent()) {
+            Student temp = studentFromDB.get();
+            temp.setName(student.getName());
+            temp.setAge(student.getAge());
+            studentRepository.save(temp);
+        }
+        return null;
     }
 
     @Override

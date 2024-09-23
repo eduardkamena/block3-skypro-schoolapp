@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.model.Avatar;
-import ru.hogwarts.school.service.Impl.AvatarServiceImpl;
+import ru.hogwarts.school.service.AvatarService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,10 +20,10 @@ import java.nio.file.Path;
 @RequestMapping
 public class AvatarController {
 
-    private final AvatarServiceImpl avatarService;
+    private final AvatarService avatarService;
 
-    public AvatarController(AvatarServiceImpl avatarServiceImpl) {
-        this.avatarService = avatarServiceImpl;
+    public AvatarController(AvatarService avatarService) {
+        this.avatarService = avatarService;
     }
 
     @PostMapping(value = "/{studentId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

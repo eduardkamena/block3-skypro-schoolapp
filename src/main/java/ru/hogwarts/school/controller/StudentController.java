@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
-import ru.hogwarts.school.service.Impl.StudentServiceImpl;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
@@ -37,7 +36,7 @@ public class StudentController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Long id, Student student) {
+    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student student) {
         Student editedStudent = studentService.updateStudent(id, student);
         if (editedStudent == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

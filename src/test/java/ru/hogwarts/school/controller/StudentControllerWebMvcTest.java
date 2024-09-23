@@ -1,28 +1,24 @@
 package ru.hogwarts.school.controller;
 
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.hogwarts.school.model.Student;
-import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebMvcTest(StudentController.class)
@@ -31,36 +27,16 @@ public class StudentControllerWebMvcTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private StudentRepository studentRepository;
-    @SpyBean
     private StudentService studentService;
-//    @InjectMocks
-//    private StudentController studentController;
-
 
     @Test
-    void shouldGetStudent() throws Exception {
+    public void shouldCreateStudent() throws Exception {
         // given
-        Long studentId = 1L;
-        Student student = new Student("Ivan", 20);
-
-        when(studentService.get(studentId)).thenReturn(student);
+        Long id = 1L;
+        String name = "name";
+        int age = 20;
 
         // when
-        ResultActions perform = mockMvc.perform(get("/student/{id}", studentId));
-
-        // then
-        perform
-                .andExpect(jsonPath("$.name").value(student.getName()))
-                .andExpect(jsonPath("$.age").value(student.getAge()))
-                .andDo(print());
-
-    @Test
-    public void saveUserTest() throws Exception {
-        Long id = 1L;
-        String name = "Bob";
-        int age = 15;
-
         JSONObject userObject = new JSONObject();
         userObject.put("name", name);
         userObject.put("age", age);
@@ -70,9 +46,10 @@ public class StudentControllerWebMvcTest {
         student.setName(name);
         student.setAge(age);
 
-        when(studentRepository.save(any(Student.class))).thenReturn(student);
-        when(studentRepository.findById(any(Long.class))).thenReturn(Optional.of(student));
+        when(studentService.createStudent(any(Student.class))).thenReturn(student);
+        // when(studentRepository.findById(any(Long.class))).thenReturn(Optional.of(student));
 
+        // then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/student") //send
                         .content(userObject.toString())
@@ -85,15 +62,18 @@ public class StudentControllerWebMvcTest {
     }
 
     @Test
-    void getStudentTest() throws Exception {
+    void shouldReadStudent() throws Exception {
+        // given
         Long id = 1L;
-        String name = "Oleg";
-        int age = 15;
+        String name = "name";
+        int age = 20;
 
         Student student = new Student(id, name, age);
 
+        // when
         when(studentService.readStudent(id)).thenReturn(student);
 
+        // then
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student/" + id))
                 .andExpect(jsonPath("$.id").value(id))
@@ -103,26 +83,29 @@ public class StudentControllerWebMvcTest {
     }
 
     @Test
-    void updateStudentTest() throws Exception {
+    void shouldUpdateStudent() throws Exception {
+        // given
         Long id = 1L;
-        String name = "Oleg";
-        int age = 15;
-        int newAge = 16;
+        String name = "name";
+        String newName = "newName";
+        int age = 20;
+        int newAge = 30;
 
+        // when
         Student student = new Student(id, name, age);
-        Student updatedStudent = new Student(id, name, newAge);
+        Student updatedStudent = new Student(id, newName, newAge);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
-        jsonObject.put("name", name);
+        jsonObject.put("name", newName);
         jsonObject.put("age", newAge);
 
         when(studentService.updateStudent(eq(id), any(Student.class))).thenReturn(updatedStudent);
-        when(studentService.readStudent(id)).thenReturn(updatedStudent);
-        when(studentRepository.save(student)).thenReturn(updatedStudent);
+        // when(studentService.readStudent(id)).thenReturn(updatedStudent);
 
+        // then
         mockMvc.perform(MockMvcRequestBuilders
-                        .put("/student/update/" + id)
+                        .put("/student/" + id)
                         .content(jsonObject.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -131,22 +114,26 @@ public class StudentControllerWebMvcTest {
     }
 
     @Test
-    void updateStudentNegativeTest() throws Exception {
+    void shouldUpdateStudentNegativeTest() throws Exception {
+        // given
         Long id = 1L;
-        String name = "Oleg";
-        int age = 15;
-        int newAge = 16;
+        String name = "name";
+        String newName = "newName";
+        int age = 20;
+        int newAge = 30;
 
+        // when
         Student student = new Student(id, name, age);
-        Student updatedStudent = new Student(id, name, newAge);
+        Student updatedStudent = new Student(id, newName, newAge);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
-        jsonObject.put("name", name);
+        jsonObject.put("name", newName);
         jsonObject.put("age", newAge);
 
         when(studentService.readStudent(id)).thenReturn(null);
 
+        // then
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/student/update/" + id)
                         .content(jsonObject.toString())
@@ -156,18 +143,92 @@ public class StudentControllerWebMvcTest {
     }
 
     @Test
-    public void testDeleteStudent() throws Exception {
+    public void shouldDeleteStudent() throws Exception {
+        // given
         long id = 1L;
-        String name = "Bob";
-        int age = 37;
+        String name = "name";
+        int age = 20;
         Student student = new Student(id, name, age);
 
-        when(studentService.readStudent(id)).thenReturn(student);
 
+        // when
+        when(studentService.deleteStudent(id)).thenReturn(student);
+
+        // then
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/student/delete/" + id)
+                        .delete("/student/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void shouldFindAgeStudent() throws Exception {
+        // given
+        Long id = 1L;
+        String name = "name";
+        int age = 20;
+
+        Student student = new Student(id, name, age);
+
+        // when
+        when(studentService.findAgeStudent(age)).thenReturn(new ArrayList<>(List.of(student)));
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student?age=" + age))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldFindAgeStudentAlternativeTest() throws Exception {
+        // given
+        List<Student> students = new ArrayList<>();
+        Student student = new Student();
+        student.setId(1L);
+        student.setName("name");
+        student.setAge(20);
+        students.add(student);
+
+        // when
+        when(studentService.findAgeStudent(student.getAge())).thenReturn(students);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student?age=" + student.getAge()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].name", Matchers.equalTo("name")));
+    }
+
+    @Test
+    public void shouldFindByAgeBetween() throws Exception {
+        // given
+        List<Student> students = new ArrayList<>();
+
+        Student firstStudent = new Student();
+        firstStudent.setName("firstName");
+        firstStudent.setAge(20);
+        students.add(firstStudent);
+
+        Student secondStudent = new Student();
+        secondStudent.setName("secondName");
+        secondStudent.setAge(40);
+        students.add(secondStudent);
+
+        int ageMin = 20;
+        int ageMax = 40;
+
+        // when
+        when(studentService.findByAgeBetween(ageMin, ageMax)).thenReturn(students);
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/ageBetween" + "?ageMin=" + ageMin + "&ageMax=" + ageMax))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].name", Matchers.equalTo("firstName")))
+                .andExpect(jsonPath("$[1].name", Matchers.equalTo("secondName")));
+    }
+
 }
