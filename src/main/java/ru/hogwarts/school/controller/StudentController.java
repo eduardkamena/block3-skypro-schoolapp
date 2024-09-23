@@ -9,6 +9,7 @@ import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "student")
@@ -77,6 +78,46 @@ public class StudentController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(foundFaculty);
+    }
+
+    @GetMapping(path = "count_amount")
+    public ResponseEntity<Integer> getAllStudents() {
+        Integer countAllStudents = studentService.getAllStudents();
+        return ResponseEntity.ok(countAllStudents);
+    }
+
+    @GetMapping(path = "average_age")
+    public ResponseEntity<Float> getAverageStudentAge() {
+        Float averageAge = studentService.getAverageStudentAge();
+        return ResponseEntity.ok(averageAge);
+    }
+
+    @GetMapping(path = "last_posted")
+    public ResponseEntity<List<Student>> getLastPostedStudents() {
+        List<Student> lastPostedStudents = studentService.getLastPostedStudents();
+        return ResponseEntity.ok(lastPostedStudents);
+    }
+
+    @GetMapping(path = "name_starts_with_E")
+    public ResponseEntity<List<String>> getStudentsNamesStartsWith() {
+        List<String> startsWith = studentService.getStudentsNamesStartsWith();
+        return ResponseEntity.ok(startsWith);
+    }
+
+    @GetMapping(path = "average_age_stream")
+    public ResponseEntity<Double> getAverageAgeAllStudentsStream() {
+        Double averageAge = studentService.getAverageAgeAllStudentsStream();
+        return ResponseEntity.ok(averageAge);
+    }
+
+    @GetMapping(path = "print-parallel")
+    public void printParallelThread() {
+        studentService.printParallelThread();
+    }
+
+    @GetMapping(path = "print-synchronized")
+    public void printSynchronizedThread() {
+        studentService.printSynchronizedThread();
     }
 
 }

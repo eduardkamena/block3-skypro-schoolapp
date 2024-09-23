@@ -196,32 +196,149 @@ public class StudentControllerIntegrationTest {
         assertEquals(actualStudent.size(), 1);
     }
 
-//    @Test
-//    public void shouldFindFacultyByStudent() throws Exception {
-//        // given
-//        Faculty faculty = new Faculty("name", "color");
-//        faculty = facultyRepository.save(faculty);
-//
-//        Student student = new Student("name", 20);
-//        student = studentRepository.save(student);
-//
-//        List<Student> students = List.of(student);
-//        faculty.setStudents(students);
-//        student.setFaculty(faculty);
-//
-//        // when
-//        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.exchange(
-//                "/student/" + student.getId() + "/faculty",
-//                HttpMethod.GET,
-//                null,
-//                Faculty.class
-//        );
-//
-//        // then
-//        assertNotNull(facultyResponseEntity);
-//        assertEquals(facultyResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
-//
-//        assertThat(facultyRepository.findById(faculty.getId())).isPresent();
-//    }
+    @Test
+    public void shouldFindFacultyByStudent() throws Exception {
+        // given
+        Faculty faculty = new Faculty("name", "color");
+        faculty = facultyRepository.save(faculty);
+
+        Student student = new Student("name", 20);
+        student.setFaculty(faculty);
+        student = studentRepository.save(student);
+
+        // when
+        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.exchange(
+                "/student/" + student.getId() + "/faculty",
+                HttpMethod.GET,
+                null,
+                Faculty.class
+        );
+
+        // then
+        assertNotNull(facultyResponseEntity);
+        assertEquals(facultyResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
+
+        assertThat(facultyRepository.findById(faculty.getId())).isPresent();
+    }
+
+    @Test
+    public void shouldGetAmountOfAllStudents() throws Exception {
+        // given
+        Student first = new Student("first", 20);
+        first = studentRepository.save(first);
+
+        Student second = new Student("second", 20);
+        second = studentRepository.save(second);
+
+        // when
+        int studentsAmount = restTemplate.getForObject(
+                "/student/" + "count_amount",
+                Integer.class
+        );
+
+        // then
+        assertThat(studentsAmount).isEqualTo(2);
+    }
+
+    @Test
+    public void shouldGetAverageStudentAge() throws Exception {
+        // given
+        Student first = new Student("first", 20);
+        first = studentRepository.save(first);
+
+        Student second = new Student("second", 30);
+        second = studentRepository.save(second);
+
+        // when
+        float studentsAverageAge = restTemplate.getForObject(
+                "/student/" + "average_age",
+                Float.class
+        );
+
+        // then
+        assertThat(studentsAverageAge).isEqualTo(25);
+    }
+
+    @Test
+    public void shouldGetLastPostedStudents() throws Exception {
+        // given
+        Student student1 = new Student("first", 20);
+        student1 = studentRepository.save(student1);
+        Student student2 = new Student("second", 21);
+        student2 = studentRepository.save(student2);
+        Student student3 = new Student("second", 21);
+        student3 = studentRepository.save(student3);
+        Student student4 = new Student("second", 21);
+        student4 = studentRepository.save(student4);
+        Student student5 = new Student("second", 21);
+        student5 = studentRepository.save(student5);
+
+        // when
+        ResponseEntity<List<Student>> studentResponseEntity = restTemplate.exchange(
+                "/student/last_posted",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        // then
+        assertNotNull(studentResponseEntity);
+        assertEquals(studentResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
+
+        List<Student> actualStudent = studentResponseEntity.getBody();
+        assert actualStudent != null;
+        assertEquals(actualStudent.size(), 5);
+        assertThat(studentRepository.findById(student1.getId())).isPresent();
+
+    }
+
+    @Test
+    public void shouldGetStudentsNamesStartsWith() throws Exception {
+        // given
+        Student first = new Student("name", 20);
+        first = studentRepository.save(first);
+
+        Student second = new Student("email", 30);
+        second = studentRepository.save(second);
+
+        // when
+        ResponseEntity<List<String>> studentResponseEntity = restTemplate.exchange(
+                "/student/name_starts_with_E",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        // then
+        assertNotNull(studentResponseEntity);
+        assertEquals(studentResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
+
+        List<String> actualStudent = studentResponseEntity.getBody();
+        assert actualStudent != null;
+        assertEquals(actualStudent.size(), 1);
+        assertThat(studentRepository.findById(second.getId())).isPresent();
+        assertThat(actualStudent.get(0)).isEqualTo("EMAIL");
+    }
+
+    @Test
+    public void shouldGetAverageAgeAllStudentsStream() throws Exception {
+        // given
+        Student first = new Student("first", 20);
+        first = studentRepository.save(first);
+
+        Student second = new Student("second", 30);
+        second = studentRepository.save(second);
+
+        // when
+        float studentsAverageAge = restTemplate.getForObject(
+                "/student/" + "average_age_stream",
+                Float.class
+        );
+
+        // then
+        assertThat(studentsAverageAge).isEqualTo(25);
+    }
 
 }

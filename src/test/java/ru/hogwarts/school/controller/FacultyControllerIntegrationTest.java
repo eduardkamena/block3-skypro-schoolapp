@@ -227,16 +227,25 @@ public class FacultyControllerIntegrationTest {
         assertEquals(studentResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
 
         assertThat(studentRepository.findById(student.getId())).isPresent();
+    }
 
-        // List<Student> actualStudent = studentResponseEntity.getBody();
+    @Test
+    public void shouldGetLongestFacultyName() throws Exception {
+        // given
+        Faculty facultyFirst = new Faculty("short", "color"); // 5 letters
+        facultyFirst = facultyRepository.save(facultyFirst);
 
-        // Я запрашиваю размер списка, по идее должен быть 1 студент, но мне возвращает 0 ?
-        // assertEquals(actualStudent.size(), 1);
+        Faculty facultySecond = new Faculty("longest", "color"); // 7 letters
+        facultySecond = facultyRepository.save(facultySecond);
 
-        // Соответственно, валятся все проверки ниже
-        // assertEquals(actualStudent.get(0).getId(), student.getId());
-        // assertEquals(actualStudent.get(0).getName(), student.getName());
-        // assertEquals(actualStudent.get(0).getAge(), student.getAge());
+        // when
+        String facultyResponseEntity = restTemplate.getForObject(
+                "/faculty/" + "longest_faculty_name",
+                String.class
+        );
+
+        // then
+        assertThat(facultyResponseEntity).isEqualTo("longest");
     }
 
 }

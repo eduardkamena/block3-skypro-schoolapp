@@ -21,4 +21,18 @@ public interface StudentService {
 
     Faculty getFaculty(Long studentId);
 
+    Integer getAllStudents();
+
+    Float getAverageStudentAge();
+
+    List<Student> getLastPostedStudents();
+
+    List<String> getStudentsNamesStartsWith();
+
+    Double getAverageAgeAllStudentsStream();
+
+    void printParallelThread();
+
+    void printSynchronizedThread();
+
 }

@@ -184,7 +184,7 @@ public class FacultyControllerWebMvcTest {
     }
 
     @Test
-    public void shouldFindByAgeBetween() throws Exception {
+    public void shouldFindFacultyByColorOrName() throws Exception {
         // given
         List<Faculty> faculties = new ArrayList<>();
 
@@ -206,6 +206,31 @@ public class FacultyControllerWebMvcTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0].name", Matchers.equalTo("name")))
                 .andExpect(jsonPath("$[0].color", Matchers.equalTo("color")));
+    }
+
+    @Test
+    public void shouldGetLongestFacultyName() throws Exception {
+        // given
+        List<Faculty> faculties = new ArrayList<>();
+
+        Faculty facultyFirst = new Faculty();
+        facultyFirst.setName("short");
+        facultyFirst.setColor("color");
+        faculties.add(facultyFirst);
+
+        Faculty facultySecond = new Faculty();
+        facultySecond.setName("longest");
+        facultySecond.setColor("color");
+        faculties.add(facultySecond);
+
+        // when
+        when(facultyService.getLongestFacultyName()).thenReturn("longest");
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty/" + "longest_faculty_name"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("longest"));
     }
 
 }

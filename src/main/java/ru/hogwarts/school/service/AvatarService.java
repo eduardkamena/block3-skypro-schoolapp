@@ -5,6 +5,7 @@ import ru.hogwarts.school.model.Avatar;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 public interface AvatarService {
 
@@ -15,5 +16,7 @@ public interface AvatarService {
     String getExtension(String fileName);
 
     byte[] generateImagePreview(Path filePath) throws IOException;
+
+    List<Avatar> findAll(Integer pageNumber, Integer pageSize);
 
 }
